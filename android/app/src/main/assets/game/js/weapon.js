@@ -35,10 +35,18 @@ class Weapon {
   }
 
   shoot(now, player, targetAngle, bulletsArray) {
-    if (!this.canShoot(now)) {
-      if (this.currentAmmo <= 0 && !this.isReloading) {
+    // Auto-reload when ammo is empty!
+    if (this.currentAmmo <= 0 && !this.isReloading) {
+      if (this.reserveAmmo !== 0) {
+        this.startReload(now, player);
+        window.particleEngine?.addFloatingText("RELOADING... (R)", player.x, player.y - 25, "#ffb700", 14);
+      } else {
         window.soundManager.playEmpty();
       }
+      return false;
+    }
+
+    if (!this.canShoot(now)) {
       return false;
     }
 

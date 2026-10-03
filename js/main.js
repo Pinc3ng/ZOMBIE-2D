@@ -279,6 +279,14 @@ class GameEngine {
     // Game Over Buttons
     document.getElementById("btn-restart").addEventListener("click", () => this.startNewGame());
     document.getElementById("btn-back-menu").addEventListener("click", () => this.quitToMenu());
+
+    // Click on Weapon Card to reload
+    const weaponCard = document.getElementById("hud-weapon-card");
+    if (weaponCard) {
+      weaponCard.addEventListener("click", () => {
+        if (this.player) this.player.activeWeapon.startReload(performance.now() / 1000, this.player);
+      });
+    }
   }
 
   selectWeapon(idx) {
@@ -296,6 +304,12 @@ class GameEngine {
     document.getElementById("menu-modal").classList.remove("active");
     document.getElementById("gameover-modal").classList.remove("active");
     document.getElementById("pause-modal").classList.remove("active");
+
+    // Restore UI visibility
+    const touchCtrl = document.getElementById("touch-controls");
+    if (touchCtrl) touchCtrl.style.display = "block";
+    const hudLyr = document.getElementById("hud-layer");
+    if (hudLyr) hudLyr.style.display = "flex";
 
     // Reset systems
     this.map = new GameMap(2400, 1800);
@@ -390,7 +404,7 @@ class GameEngine {
 
   onPlayerKilled() {
     this.state = "GAME_OVER";
-    window.soundManager.playExplosion();
+    this.addScreenShake(20);
 
     // Check High Score
     if (this.player.score > this.highScore) {
@@ -404,7 +418,16 @@ class GameEngine {
     document.getElementById("go-score").textContent = this.player.score;
     document.getElementById("go-highscore").textContent = this.highScore;
 
-    document.getElementById("gameover-modal").classList.add("active");
+    // Hide gameplay touch & hud layers during game over
+    const touchCtrl = document.getElementById("touch-controls");
+    if (touchCtrl) touchCtrl.style.display = "none";
+    const hudLyr = document.getElementById("hud-layer");
+    if (hudLyr) hudLyr.style.display = "none";
+
+    // Show Game Over modal with slight dramatic delay
+    setTimeout(() => {
+      document.getElementById("gameover-modal").classList.add("active");
+    }, 500);
   }
 
   togglePause() {
@@ -422,6 +445,13 @@ class GameEngine {
     document.getElementById("pause-modal").classList.remove("active");
     document.getElementById("gameover-modal").classList.remove("active");
     document.getElementById("menu-modal").classList.add("active");
+    
+    // Restore UI visibility
+    const touchCtrl = document.getElementById("touch-controls");
+    if (touchCtrl) touchCtrl.style.display = "block";
+    const hudLyr = document.getElementById("hud-layer");
+    if (hudLyr) hudLyr.style.display = "flex";
+
     this.hideBossHp();
   }
 
@@ -703,7 +733,11 @@ class GameEngine {
     document.getElementById("hud-weapon-name").textContent = w.name;
     document.getElementById("hud-ammo-cur").textContent = w.currentAmmo;
     document.getElementById("hud-ammo-max").textContent = w.reserveAmmo === -1 ? "∞" : w.reserveAmmo;
-    document.getElementById("hud-reloading").style.display = w.isReloading ? "block" : "none";
+    
+    const reloadingEl = document.getElementById("hud-reloading");
+    const emptyPromptEl = document.getElementById("hud-empty-prompt");
+    if (reloadingEl) reloadingEl.style.display = w.isReloading ? "block" : "none";
+    if (emptyPromptEl) emptyPromptEl.style.display = (!w.isReloading && w.currentAmmo === 0) ? "block" : "none";
 
     // Grenades text
     document.getElementById("grenade-count-txt").textContent = this.player.grenades;

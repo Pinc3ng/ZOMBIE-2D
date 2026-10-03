@@ -104,14 +104,15 @@
       </div>
 
       <!-- Bottom Weapon & Ammo Display -->
-      <div class="weapon-card">
+      <div class="weapon-card" id="hud-weapon-card" title="Klik untuk Reload / Tekan 'R'">
         <div class="weapon-icon-box" id="hud-weapon-icon">🔫</div>
         <div class="weapon-info">
           <div class="weapon-name" id="hud-weapon-name">M1911 PISTOL</div>
           <div class="ammo-display">
             <span id="hud-ammo-cur">12</span> / <span id="hud-ammo-max" class="ammo-total">∞</span>
           </div>
-          <div id="hud-reloading" class="reloading-text">RELOADING...</div>
+          <div id="hud-reloading" class="reloading-text">🔄 RELOADING...</div>
+          <div id="hud-empty-prompt" class="reloading-text" style="color:#ffaa00; animation:pulse 0.5s infinite alternate; display:none;">⚠️ TEKAN 'R' ATAU KLIK</div>
         </div>
       </div>
     </div>
@@ -138,12 +139,12 @@
           <span class="btn-subtext">DASH</span>
         </button>
         <!-- Reload Button -->
-        <button id="btn-touch-reload" class="action-btn btn-reload" aria-label="Reload">
+        <button id="btn-touch-reload" class="action-btn btn-reload" aria-label="Reload (R)">
           🔄
           <span class="btn-subtext">RELOAD</span>
         </button>
         <!-- Grenade Button -->
-        <button id="btn-touch-grenade" class="action-btn btn-grenade" aria-label="Throw Grenade">
+        <button id="btn-touch-grenade" class="action-btn btn-grenade" aria-label="Throw Grenade (G)">
           💣
           <span class="btn-subtext" id="grenade-count-txt">3</span>
         </button>
@@ -157,15 +158,15 @@
       <div class="modal-content">
         <img src="assets/banner.jpg" alt="Zombie Survival Banner" class="menu-banner-img">
         <h1 class="game-title">ZOMBIE <span>SURVIVAL 2D</span></h1>
-        <p class="game-subtitle">SURVIVE THE APOCALYPTIC HORDE • UPGRADE • DOMINATE</p>
+        <p class="game-subtitle">BERTAHAN DARI SERANGAN ZOMBIE • UPGRADE • DOMINASI</p>
 
         <button id="btn-start-game" class="btn-primary">▶ PLAY GAME</button>
-        <button id="btn-show-controls" class="btn-secondary">🎮 HOW TO PLAY</button>
+        <button id="btn-show-controls" class="btn-secondary">🎮 CARA BERMAIN</button>
         <button id="btn-toggle-flashlight" class="btn-secondary">🔦 NIGHT HORROR MODE: ON</button>
 
         <div class="controls-hint">
-          <b>Mobile:</b> Virtual Joystick (kiri) untuk bergerak, tombol aksi (kanan) untuk menembak, dash, reload & granat.<br>
-          <b>Desktop:</b> WASD / Panah untuk gerak, Mouse untuk bidik & tembak, Spasi untuk Dash, R untuk Reload, 1-4 ganti senjata.
+          <b>Mobile:</b> Analog Joystick (kiri) untuk jalan, tombol aksi (kanan) untuk menembak, dash, reload (🔄) & granat.<br>
+          <b>Desktop:</b> WASD untuk gerak, Mouse bidik & tembak, Spasi untuk Dash, <b>R untuk Reload</b>, 1-4 ganti senjata.
         </div>
       </div>
     </div>
@@ -188,31 +189,31 @@
          GAME OVER MODAL
          ==================================================================== -->
     <div id="gameover-modal" class="modal-overlay">
-      <div class="modal-content">
-        <h2 style="color:var(--neon-red); font-size:28px; font-weight:900; letter-spacing:2px;">💀 YOU DIED 💀</h2>
-        <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">The horde consumed your flesh...</p>
+      <div class="modal-content" style="border-color: #ff2255; box-shadow: 0 0 35px rgba(255, 34, 85, 0.4);">
+        <h2 style="color:var(--neon-red); font-size:32px; font-weight:900; letter-spacing:2px;">💀 YOU DIED 💀</h2>
+        <p style="color:var(--text-muted); font-size:14px; margin-top:6px;">Gerombolan zombie telah menghabisimu...</p>
 
         <div class="gameover-stats">
           <div class="gameover-stat-box">
-            <div class="title">WAVE REACHED</div>
+            <div class="title">WAVE BERTAHAN</div>
             <div class="val" id="go-wave">1</div>
           </div>
           <div class="gameover-stat-box">
-            <div class="title">ZOMBIES KILLED</div>
+            <div class="title">ZOMBIE DIBASMI</div>
             <div class="val" id="go-kills">0</div>
           </div>
           <div class="gameover-stat-box">
-            <div class="title">FINAL SCORE</div>
+            <div class="title">SKOR AKHIR</div>
             <div class="val" id="go-score">0</div>
           </div>
           <div class="gameover-stat-box">
-            <div class="title">HIGH SCORE</div>
+            <div class="title">SKOR TERTINGGI</div>
             <div class="val" id="go-highscore" style="color:var(--neon-yellow);">0</div>
           </div>
         </div>
 
-        <button id="btn-restart" class="btn-primary">🔄 PLAY AGAIN</button>
-        <button id="btn-back-menu" class="btn-secondary">🏠 MAIN MENU</button>
+        <button id="btn-restart" class="btn-primary" style="background: linear-gradient(135deg, #ff2255 0%, #bb0033 100%); color:#fff;">🔄 MAIN LAGI (TRY AGAIN)</button>
+        <button id="btn-back-menu" class="btn-secondary">🏠 KEMBALI KE MENU</button>
       </div>
     </div>
 

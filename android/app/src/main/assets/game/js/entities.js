@@ -63,6 +63,7 @@ class Player {
 
     // Damage invulnerability frames
     this.invulnerableTimer = 0;
+    this.isDead = false;
   }
 
   get activeWeapon() {
@@ -96,7 +97,7 @@ class Player {
   }
 
   takeDamage(amount, now) {
-    if (this.invulnerableTimer > 0 || this.isDashing) return;
+    if (this.isDead || this.invulnerableTimer > 0 || this.isDashing) return;
 
     this.lastShieldHitTime = now;
     this.invulnerableTimer = 0.35; // i-frames
@@ -120,6 +121,10 @@ class Player {
       window.particleEngine.addBloodSpurt(this.x, this.y, this.rotation + Math.PI, 6);
       if (this.hp <= 0) {
         this.hp = 0;
+        this.isDead = true;
+        window.soundManager.playDeathDoom();
+        window.particleEngine.addBloodDecal(this.x, this.y, 45, "#7a0418");
+        window.particleEngine.addFloatingText("💀 YOU DIED! 💀", this.x, this.y - 40, "#ff0044", 26, true);
         window.gameEngine?.onPlayerKilled();
       }
     }
@@ -250,6 +255,20 @@ class Player {
   draw(ctx, camera) {
     ctx.save();
     ctx.translate(this.x - camera.x, this.y - camera.y);
+
+    if (this.isDead) {
+      // Fallen survivor corpse in pool of blood
+      ctx.fillStyle = "#1e2c23";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.radius + 6, this.radius * 0.65, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#550010";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
+
     ctx.rotate(this.rotation);
 
     // Shield protective aura ring

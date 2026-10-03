@@ -400,6 +400,42 @@ class SoundManager {
 
     this.vibrate([40, 30, 60]);
   }
+
+  // Player Death Doom Sound (Dramatic deep drop + flatline)
+  playDeathDoom() {
+    if (!this.ctx || this.isMuted) return;
+    const now = this.ctx.currentTime;
+
+    // Sub bass drop
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.exponentialRampToValueAtTime(20, now + 1.2);
+
+    gain.gain.setValueAtTime(0.7, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 1.4);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start(now);
+    osc.stop(now + 1.5);
+
+    // Heartbeat flatline tone
+    const flatline = this.ctx.createOscillator();
+    const flatGain = this.ctx.createGain();
+    flatline.type = "sine";
+    flatline.frequency.setValueAtTime(440, now + 0.3);
+    flatGain.gain.setValueAtTime(0.2, now + 0.3);
+    flatGain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+
+    flatline.connect(flatGain);
+    flatGain.connect(this.masterGain);
+    flatline.start(now + 0.3);
+    flatline.stop(now + 1.5);
+
+    this.vibrate([100, 50, 200, 100, 400]);
+  }
 }
 
 // Global sound manager instance
