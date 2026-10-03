@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Zombie Survival 2D - Mobile Apocalypse</title>
+  <meta name="description" content="Intense 2D top-down mobile zombie survival shooter with responsive touch controls, rogue-lite perks, and weapon upgrades.">
+  <meta name="theme-color" content="#0a0d14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="assets/manifest.json">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Main 2D Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Red Damage Vignette -->
+    <div id="damage-vignette"></div>
+
+    <!-- HUD Overlay -->
+    <div id="hud-layer">
+      <!-- Top HUD Header -->
+      <div class="top-hud">
+        <!-- Player Status Bars -->
+        <div class="player-status-card">
+          <!-- HP Bar -->
+          <div class="status-row">
+            <span class="status-label">HP</span>
+            <div class="bar-container">
+              <div id="hp-bar" class="bar-fill bar-hp" style="width: 100%;"></div>
+            </div>
+            <span id="hp-text" class="status-val">100/100</span>
+          </div>
+          <!-- Shield Bar -->
+          <div class="status-row">
+            <span class="status-label">SHD</span>
+            <div class="bar-container">
+              <div id="shield-bar" class="bar-fill bar-shield" style="width: 100%;"></div>
+            </div>
+            <span id="shield-text" class="status-val">50/50</span>
+          </div>
+          <!-- Stamina Bar -->
+          <div class="status-row">
+            <span class="status-label">STM</span>
+            <div class="bar-container">
+              <div id="stamina-bar" class="bar-fill bar-stamina" style="width: 100%;"></div>
+            </div>
+            <span id="stamina-text" class="status-val">100%</span>
+          </div>
+        </div>
+
+        <!-- Center Wave Tracker -->
+        <div class="wave-center-hud">
+          <div id="wave-badge" class="wave-badge">WAVE 1</div>
+          <div class="wave-progress-bar">
+            <div id="wave-progress-fill" class="wave-progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- Right Stats (Score, Gold, XP) -->
+        <div class="stats-card">
+          <div class="stat-item">SCORE <span id="score-text">0</span></div>
+          <div class="stat-item stat-gold">COINS 🪙 <span id="gold-text">0</span></div>
+          <div class="stat-item">LVL <span id="lvl-text" style="color:var(--neon-cyan);">1</span> (<span id="xp-text">0/100</span>)</div>
+          <div class="top-buttons">
+            <button id="btn-sound-toggle" class="icon-btn" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+            <button id="btn-pause" class="icon-btn" title="Pause Game" aria-label="Pause Game">⏸</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boss Bar (Visible during boss fight) -->
+      <div id="boss-hud">
+        <div class="boss-title-row">
+          <span id="boss-name">⚠️ MUTANT TYRANT BOSS</span>
+          <span id="boss-hp-val">100%</span>
+        </div>
+        <div class="boss-bar-wrap">
+          <div id="boss-bar-fill" class="boss-bar-fill"></div>
+        </div>
+      </div>
+
+      <!-- Quick Weapon Switcher Strip (Top Right) -->
+      <div class="quick-weapons">
+        <button class="quick-w-btn active" data-weapon="0" id="w-btn-0">
+          <span class="w-num">1</span>
+          <span class="w-icon">🔫</span>
+        </button>
+        <button class="quick-w-btn" data-weapon="1" id="w-btn-1">
+          <span class="w-num">2</span>
+          <span class="w-icon">💥</span>
+        </button>
+        <button class="quick-w-btn" data-weapon="2" id="w-btn-2">
+          <span class="w-num">3</span>
+          <span class="w-icon">⚡</span>
+        </button>
+        <button class="quick-w-btn" data-weapon="3" id="w-btn-3">
+          <span class="w-num">4</span>
+          <span class="w-icon">🚀</span>
+        </button>
+      </div>
+
+      <!-- Bottom Weapon & Ammo Display -->
+      <div class="weapon-card">
+        <div class="weapon-icon-box" id="hud-weapon-icon">🔫</div>
+        <div class="weapon-info">
+          <div class="weapon-name" id="hud-weapon-name">M1911 PISTOL</div>
+          <div class="ammo-display">
+            <span id="hud-ammo-cur">12</span> / <span id="hud-ammo-max" class="ammo-total">∞</span>
+          </div>
+          <div id="hud-reloading" class="reloading-text">RELOADING...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Touch Controls Layer -->
+    <div id="touch-controls">
+      <!-- Left Movement Joystick Zone -->
+      <div id="joystick-zone">
+        <div class="joystick-base">
+          <div id="joystick-knob" class="joystick-knob"></div>
+        </div>
+      </div>
+
+      <!-- Right Action Buttons -->
+      <div class="mobile-action-buttons">
+        <!-- Fire Button -->
+        <button id="btn-touch-fire" class="action-btn btn-fire" aria-label="Fire Weapon">
+          🔥
+          <span class="btn-subtext">FIRE</span>
+        </button>
+        <!-- Dash Button -->
+        <button id="btn-touch-dash" class="action-btn btn-dash" aria-label="Dash">
+          ⚡
+          <span class="btn-subtext">DASH</span>
+        </button>
+        <!-- Reload Button -->
+        <button id="btn-touch-reload" class="action-btn btn-reload" aria-label="Reload">
+          🔄
+          <span class="btn-subtext">RELOAD</span>
+        </button>
+        <!-- Grenade Button -->
+        <button id="btn-touch-grenade" class="action-btn btn-grenade" aria-label="Throw Grenade">
+          💣
+          <span class="btn-subtext" id="grenade-count-txt">3</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         START MENU MODAL
+         ==================================================================== -->
+    <div id="menu-modal" class="modal-overlay active">
+      <div class="modal-content">
+        <img src="assets/banner.jpg" alt="Zombie Survival Banner" class="menu-banner-img">
+        <h1 class="game-title">ZOMBIE <span>SURVIVAL 2D</span></h1>
+        <p class="game-subtitle">SURVIVE THE APOCALYPTIC HORDE • UPGRADE • DOMINATE</p>
+
+        <button id="btn-start-game" class="btn-primary">▶ PLAY GAME</button>
+        <button id="btn-show-controls" class="btn-secondary">🎮 HOW TO PLAY</button>
+        <button id="btn-toggle-flashlight" class="btn-secondary">🔦 NIGHT HORROR MODE: ON</button>
+
+        <div class="controls-hint">
+          <b>Mobile:</b> Virtual Joystick (kiri) untuk bergerak, tombol aksi (kanan) untuk menembak, dash, reload & granat.<br>
+          <b>Desktop:</b> WASD / Panah untuk gerak, Mouse untuk bidik & tembak, Spasi untuk Dash, R untuk Reload, 1-4 ganti senjata.
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         LEVEL UP / PERK UPGRADE MODAL (Rogue-lite)
+         ==================================================================== -->
+    <div id="upgrade-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2 style="color:var(--neon-green); font-size:24px; font-weight:900;">⭐ LEVEL UP! ⭐</h2>
+        <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">PILIH PERK UPGRADE SURVIVAL:</p>
+        
+        <div id="upgrade-cards-container" class="upgrade-cards-grid">
+          <!-- Dynamically populated 3 cards -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         GAME OVER MODAL
+         ==================================================================== -->
+    <div id="gameover-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2 style="color:var(--neon-red); font-size:28px; font-weight:900; letter-spacing:2px;">💀 YOU DIED 💀</h2>
+        <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">The horde consumed your flesh...</p>
+
+        <div class="gameover-stats">
+          <div class="gameover-stat-box">
+            <div class="title">WAVE REACHED</div>
+            <div class="val" id="go-wave">1</div>
+          </div>
+          <div class="gameover-stat-box">
+            <div class="title">ZOMBIES KILLED</div>
+            <div class="val" id="go-kills">0</div>
+          </div>
+          <div class="gameover-stat-box">
+            <div class="title">FINAL SCORE</div>
+            <div class="val" id="go-score">0</div>
+          </div>
+          <div class="gameover-stat-box">
+            <div class="title">HIGH SCORE</div>
+            <div class="val" id="go-highscore" style="color:var(--neon-yellow);">0</div>
+          </div>
+        </div>
+
+        <button id="btn-restart" class="btn-primary">🔄 PLAY AGAIN</button>
+        <button id="btn-back-menu" class="btn-secondary">🏠 MAIN MENU</button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         PAUSE MODAL
+         ==================================================================== -->
+    <div id="pause-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2 style="color:#fff; font-size:24px; font-weight:900; margin-bottom:18px;">GAME PAUSED</h2>
+        <button id="btn-resume" class="btn-primary">RESUME</button>
+        <button id="btn-pause-sound" class="btn-secondary">TOGGLE AUDIO</button>
+        <button id="btn-quit" class="btn-secondary">QUIT TO MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Scripts Modular Pipeline -->
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/weapon.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
